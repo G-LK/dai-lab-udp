@@ -9,6 +9,12 @@ public class App {
     }
 
     public static void main(String[] args) {
-        System.out.println(new App().getGreeting());
+        System.out.println("Starting listener and reporter");
+
+        Thread listenThread = new Thread(new Listener());
+        Thread reportThread = new Thread(new Reporter());
+
+        listenThread.start();
+        reportThread.start();
     }
 }

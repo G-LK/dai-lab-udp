@@ -19,7 +19,7 @@ public class Reporter implements Runnable {
 
     @Override
     public void run() {
-        System.out.println("Reporter !");
+        System.out.println("Started Reporter !");
         ObjectMapper mapper = new ObjectMapper();
         String report = "error";
         try {

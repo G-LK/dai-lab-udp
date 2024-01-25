@@ -7,6 +7,7 @@ import java.net.InetSocketAddress;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
@@ -19,7 +20,8 @@ public class Musician {
     final String uuid;
     final String sound;
 
-    static Map<String, String> soundsByInstrument = new HashMap<>();
+    // Static constant sounds list
+    static final Map<String, String> soundsByInstrument = new ConcurrentHashMap<>();
     static {
         soundsByInstrument.put("piano", "ti-ta-ti");
         soundsByInstrument.put("trumpet", "pouet");
@@ -38,7 +40,6 @@ public class Musician {
 
     void play() {
         try (DatagramSocket socket = new DatagramSocket()) {
-            socket.setBroadcast(true);
 
             Sound soundEvent = new Sound(uuid, sound);
 

@@ -1,6 +1,5 @@
 package dai;
 
-import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -9,7 +8,7 @@ public class Musician {
     public String instrument;
     public Long lastActivity;
 
-    static Map<String, String> instrumentsBySound = new HashMap<>();
+    static final Map<String, String> instrumentsBySound = new ConcurrentHashMap<>();
     static {
         instrumentsBySound.put("ti-ta-ti", "piano");
         instrumentsBySound.put("pouet", "trumpet");
@@ -28,11 +27,6 @@ public class Musician {
     }
 
     public static final Map<String, Musician> musicians = new ConcurrentHashMap<>();
-
-    static {
-        musicians.put("salut", new Musician("salut", "flute", Long.valueOf(1232100000)));
-        musicians.put("yo", new Musician("yo", "violo", Long.valueOf(22320)));
-    }
 
     public void dropInactiveMusicians() {
         for (var entry : musicians.entrySet()) {

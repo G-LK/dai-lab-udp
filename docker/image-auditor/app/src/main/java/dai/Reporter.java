@@ -21,12 +21,6 @@ public class Reporter implements Runnable {
     public void run() {
         System.out.println("Started Reporter !");
         ObjectMapper mapper = new ObjectMapper();
-        String report = "error";
-        try {
-            report = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(Musician.musicians);
-        } catch (JsonProcessingException e) {
-            e.printStackTrace();
-        }
 
         try (ServerSocket serverSocket = new ServerSocket(TCP_PORT)) {
             while (true) {
@@ -39,7 +33,10 @@ public class Reporter implements Runnable {
                                 new OutputStreamWriter(
                                         socket.getOutputStream(), StandardCharsets.UTF_8))) {
 
-                    System.out.println("Sending report " + report);
+                    String report = "error";
+                    Listener.dropInactiveMusicians();
+                    report = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(Listener.musicians.elements());
+
                     out.write(report + "\n");
                     out.flush();
                 } catch (IOException e) {

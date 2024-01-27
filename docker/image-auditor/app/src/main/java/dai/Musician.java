@@ -25,14 +25,4 @@ public class Musician {
         this.instrument = instrument;
         this.lastActivity = lastActivity;
     }
-
-    public static final Map<String, Musician> musicians = new ConcurrentHashMap<>();
-
-    public void dropInactiveMusicians() {
-        for (var entry : musicians.entrySet()) {
-            if (entry.getValue().lastActivity < System.currentTimeMillis() - 5000) {
-                musicians.remove(entry.getKey());
-            }
-        }
-    }
 }

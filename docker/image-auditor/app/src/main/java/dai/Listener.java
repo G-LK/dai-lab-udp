@@ -6,6 +6,7 @@ import java.net.InetSocketAddress;
 import java.net.MulticastSocket;
 import java.net.NetworkInterface;
 import java.net.SocketException;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -27,6 +28,7 @@ public class Listener implements Runnable {
     final static int BUFFER_SIZE = 100; // 100 is way above datagram length of ~66 chars
     InetSocketAddress group_address = new InetSocketAddress(IPADDRESS, UDP_PORT);
     NetworkInterface netif;
+    public static final ConcurrentHashMap<String, Musician> musicians = new ConcurrentHashMap<>();
 
     final MulticastSocket socket;
 
@@ -49,21 +51,16 @@ public class Listener implements Runnable {
 
                 String message = new String(packet.getData(), 0,
                         packet.getLength(), StandardCharsets.UTF_8);
-                System.out.println("Received message: " + message +
-                        " from " + packet.getAddress() +
-                        ", port " + packet.getPort());
 
                 ObjectMapper mapper = new ObjectMapper();
                 Sound sound = mapper.readValue(message, Sound.class);
+                System.out.println("I heard some " + sound.sound);
 
-                if (Musician.musicians.containsKey(sound.uuid)) {
-                    Musician.musicians.get(sound.uuid).lastActivity = System.currentTimeMillis();
-                    System.out.println("update lastActivity" + sound);
+                if (musicians.containsKey(sound.uuid)) {
+                    musicians.get(sound.uuid).lastActivity = System.currentTimeMillis();
                 } else {
-                    Musician.musicians.put(sound.uuid, new Musician(sound.uuid,
+                    musicians.put(sound.uuid, new Musician(sound.uuid,
                             Musician.instrumentsBySound.get(sound.sound), System.currentTimeMillis()));
-                    System.out.println("put new musician " + sound);
-
                 }
             }
 
@@ -78,4 +75,12 @@ public class Listener implements Runnable {
         }
     }
 
+    public static void dropInactiveMusicians() {
+        for (var entry : musicians.entrySet()) {
+            if (entry.getValue().lastActivity < System.currentTimeMillis() - 5000) {
+                System.out.println("Dropped inactive " + entry.getValue().instrument);
+                musicians.remove(entry.getKey());
+            }
+        }
+    }
 }
